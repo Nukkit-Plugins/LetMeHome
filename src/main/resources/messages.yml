@@ -1,0 +1,6 @@
+m_version: 1
+
+default-language: "eng"
+
+eng-default-prefix: "[Home]"
+eng-command-sethome: "sethome"
