@@ -1,0 +1,5 @@
+name: LetMeHome
+main: kr.mohi.letmehome.LetMeHome
+author: MohiPE
+version: "1.0.0"
+api: ["1.0.0"]
