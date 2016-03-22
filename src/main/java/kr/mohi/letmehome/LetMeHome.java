@@ -2,6 +2,8 @@ package kr.mohi.letmehome;
 
 import java.util.LinkedHashMap;
 
+import cn.nukkit.Player;
+import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.SimpleCommandMap;
@@ -20,6 +22,39 @@ public class LetMeHome extends PluginBase implements Listener {
 		this.getDataFolder().mkdirs();
 		this.initDB();
 		this.getServer().getPluginManager().registerEvents(this, this);
+	}
+
+	@Override
+	public boolean onCommand(CommandSender player, Command command, String label, String[] args) {
+		if (command.getName().toLowerCase() == this.get("command-sethome")) {
+			if (!(player instanceof Player)) {
+				this.getLogger().info("Do not use this command on console");
+				return true;
+			}
+			if (args.length == 0) {
+				this.get("command.sethome.usage");
+				return true;
+			}
+			try {
+				this.setHome((Player) player, args[0], args[1]);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public void setHome(final Player player, String name, final String isPublic) {
+		this.homeDB.put(player.getName(), new LinkedHashMap<String, Object>() {
+			{
+				put("level", player.getLevel().toString());
+				put("x", (int) player.getX());
+				put("y", (int) player.getY());
+				put("z", (int) player.getZ());
+				put("isPublic", isPublic);
+			}
+		});
+		this.save();
 	}
 
 	public void initMessage() {
@@ -41,7 +76,7 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	public void registerCommands() {
-		
+
 	}
 
 	public void registerCommand(String name, String descript, String usage, String permission) {
@@ -53,6 +88,9 @@ public class LetMeHome extends PluginBase implements Listener {
 		commandMap.register(name, command);
 	}
 
+	public void save() {
+		
+	}
 	public String get(String key) {
 		return this.messages.get(this.messages.get("default-language", "kor") + "-" + key, "default-value");
 	}

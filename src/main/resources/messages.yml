@@ -4,3 +4,11 @@ default-language: "eng"
 
 eng-default-prefix: "[Home]"
 eng-command-sethome: "sethome"
+eng-command-delhome: "delhome"
+eng-command-home: "home"
+eng-command-homelist: "homelist"
+
+eng-command-sethome-public: "public"
+eng-command-sethome-private: "private"
+eng-command-homelist-mine: "mine"
+eng-command-homelist-
