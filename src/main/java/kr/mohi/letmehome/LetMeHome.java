@@ -21,6 +21,8 @@ public class LetMeHome extends PluginBase implements Listener {
 	public void onEnable() {
 		this.getDataFolder().mkdirs();
 		this.initDB();
+		this.initMessage();
+		this.updateMessage();
 		this.getServer().getPluginManager().registerEvents(this, this);
 	}
 
