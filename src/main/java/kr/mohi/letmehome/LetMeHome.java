@@ -57,6 +57,7 @@ public class LetMeHome extends PluginBase implements Listener {
 				} catch (Exception e) {
 					getLogger().alert(e.getMessage());
 				}
+				break;
 			}
 		}
 		if (command.getName().toLowerCase() == get("command-delhome")) {
