@@ -10,5 +10,7 @@ eng-command-homelist: "homelist"
 
 eng-command-sethome-public: "public"
 eng-command-sethome-private: "private"
-eng-command-homelist-mine: "mine"
-eng-command-homelist-
+eng-command-homelist-mine: "private"
+eng-command-homelist-public: "public"
+
+eng-command-sethome-usage: "/sethome < public | private >"

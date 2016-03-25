@@ -1,5 +1,6 @@
 package kr.mohi.letmehome;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import cn.nukkit.Player;
@@ -13,9 +14,8 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
 
 public class LetMeHome extends PluginBase implements Listener {
-	private LinkedHashMap<String, Object> homeDB;
 	private int m_version;
-	private Config messages, config;
+	private Config messages, config, homeDB;
 
 	@Override
 	public void onEnable() {
@@ -28,53 +28,92 @@ public class LetMeHome extends PluginBase implements Listener {
 
 	@Override
 	public boolean onCommand(CommandSender player, Command command, String label, String[] args) {
-		if (command.getName().toLowerCase() == this.get("command-sethome")) {
+		if (command.getName().toLowerCase() == get("command-sethome")) {
+			if (!(player instanceof Player)) {
+				this.getLogger().info("Do not use this command on console");
+				return true;
+			}
+			if (args.length == 0 || args.length == 1) {
+				alert(player, get("command.sethome.usage"));
+				return true;
+			}
+			switch (args[1].toLowerCase()) {
+			case "true":
+			case "on":
+			case "y":
+			case "yes":
+				try {
+					this.setHome(args[0], (Player) player, true);
+				} catch (Exception e) {
+					getLogger().alert(e.getMessage());
+				}
+				break;
+			case "false":
+			case "off":
+			case "n":
+			case "no":
+				try {
+					setHome(args[0], (Player) player, false);
+				} catch (Exception e) {
+					getLogger().alert(e.getMessage());
+				}
+			}
+		}
+		if (command.getName().toLowerCase() == get("command-delhome")) {
 			if (!(player instanceof Player)) {
 				this.getLogger().info("Do not use this command on console");
 				return true;
 			}
 			if (args.length == 0) {
-				this.get("command.sethome.usage");
+				alert(player, get("command.delhome.usage"));
 				return true;
 			}
-			try {
-				this.setHome((Player) player, args[0], args[1]);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+
 		}
 		return false;
 	}
 
-	public void setHome(final Player player, String name, final String isPublic) {
-		this.homeDB.put(player.getName(), new LinkedHashMap<String, Object>() {
+	@SuppressWarnings("serial")
+	public void setHome(String name, final Player player, Boolean isPublic) {
+		homeDB.set(name, new LinkedHashMap<String, Object>() {
 			{
-				put("level", player.getLevel().toString());
-				put("x", (int) player.getX());
-				put("y", (int) player.getY());
-				put("z", (int) player.getZ());
-				put("isPublic", isPublic);
+				{
+					put("owner", new ArrayList<String>().add(player.getName()));
+					put("level", player.getLevel().toString());
+					put("x", (int) player.getX());
+					put("y", (int) player.getY());
+					put("z", (int) player.getZ());
+					put("isPublic", isPublic);
+				}
 			}
 		});
-		this.save();
+		save(homeDB);
 	}
 
+	@SuppressWarnings("unchecked")
+	public void delHome(String name, Player player) {
+		if (((ArrayList<String>) ((LinkedHashMap<String, Object>) homeDB.get(name)).get("owner"))
+				.contains((player.getName()))) {
+
+		}
+	}
+
+	/* ---------------------------BasicMethods--------------------------- */
 	public void initMessage() {
-		this.saveResource("messages.yml");
-		this.messages = new Config(this.getDataFolder() + "/messages.yml", Config.YAML);
+		saveResource("messages.yml");
+		messages = new Config(getDataFolder() + "/messages.yml", Config.YAML);
 	}
 
 	public void updateMessage() {
-		if (this.messages.get("m_version", 1) < this.m_version) {
-			this.saveResource("messages.yml", true);
-			messages = new Config(this.getDataFolder() + "/messages.yml");
+		if (messages.get("m_version", 1) < m_version) {
+			saveResource("messages.yml", true);
+			messages = new Config(getDataFolder() + "/messages.yml");
 		}
 	}
 
 	public void initDB() {
-		this.homeDB = (LinkedHashMap<String, Object>) (new Config(getDataFolder() + "/homeDB.json", Config.JSON))
-				.getAll();
-		this.config = new Config(getDataFolder() + "/config.yml", Config.YAML);
+		homeDB = new Config(getDataFolder() + "/homeDB.json", Config.JSON);
+		config = new Config(getDataFolder() + "/config.yml", Config.YAML);
 	}
 
 	public void registerCommands() {
@@ -91,10 +130,16 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	public void save() {
-		
+		save(homeDB);
+		save(config);
 	}
+
+	public void save(Config config) {
+		config.save();
+	}
+
 	public String get(String key) {
-		return this.messages.get(this.messages.get("default-language", "kor") + "-" + key, "default-value");
+		return messages.get(messages.get("default-language", "eng") + "-" + key, "default-value");
 	}
 
 	public void alert(CommandSender player, String message) {
