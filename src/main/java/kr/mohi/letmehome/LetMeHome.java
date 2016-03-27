@@ -38,20 +38,14 @@ public class LetMeHome extends PluginBase implements Listener {
 				return true;
 			}
 			switch (args[1].toLowerCase()) {
-			case "true":
-			case "on":
-			case "y":
-			case "yes":
+			case "public":
 				try {
 					this.setHome(args[0], (Player) player, true);
 				} catch (Exception e) {
 					getLogger().alert(e.getMessage());
 				}
 				break;
-			case "false":
-			case "off":
-			case "n":
-			case "no":
+			case "private":
 				try {
 					setHome(args[0], (Player) player, false);
 				} catch (Exception e) {
@@ -75,7 +69,9 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	@SuppressWarnings("serial")
-	public void setHome(String name, final Player player, Boolean isPublic) {
+	public boolean setHome(String name, final Player player, Boolean isPublic) {
+		if(homeDB.exists(name))
+			return false;
 		homeDB.set(name, new LinkedHashMap<String, Object>() {
 			{
 				{
@@ -89,14 +85,17 @@ public class LetMeHome extends PluginBase implements Listener {
 			}
 		});
 		save(homeDB);
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
-	public void delHome(String name, Player player) {
+	public boolean delHome(String name, Player player) {
 		if (((ArrayList<String>) ((LinkedHashMap<String, Object>) homeDB.get(name)).get("owner"))
 				.contains((player.getName()))) {
-
+			homeDB.remove(name);
+			return true;
 		}
+		else return false;
 	}
 
 	/* ---------------------------BasicMethods--------------------------- */
