@@ -27,27 +27,28 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender player, Command command, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (command.getName().toLowerCase() == get("command-sethome")) {
-			if (!(player instanceof Player)) {
+			if (!(sender instanceof Player)) {
 				this.getLogger().info("Do not use this command on console");
 				return true;
 			}
 			if (args.length == 0 || args.length == 1) {
-				alert(player, get("command.sethome.usage"));
+				alert(sender, get("command.sethome.usage"));
 				return true;
 			}
+			Player player = getServer().getPlayer(sender.getName());
 			switch (args[1].toLowerCase()) {
 			case "public":
 				try {
-					this.setHome(args[0], (Player) player, true);
+					setHome(args[0], player, true);
 				} catch (Exception e) {
 					getLogger().alert(e.getMessage());
 				}
 				break;
 			case "private":
 				try {
-					setHome(args[0], (Player) player, false);
+					setHome(args[0], player, false);
 				} catch (Exception e) {
 					getLogger().alert(e.getMessage());
 				}
@@ -55,19 +56,33 @@ public class LetMeHome extends PluginBase implements Listener {
 			}
 		}
 		if (command.getName().toLowerCase() == get("command-delhome")) {
-			if (!(player instanceof Player)) {
-				this.getLogger().info("Do not use this command on console");
+			if (!(sender instanceof Player)) {
+				getLogger().info("Do not use this command on console");
 				return true;
 			}
 			if (args.length == 0) {
-				alert(player, get("command.delhome.usage"));
+				alert(sender, get("command.delhome.usage"));
 				return true;
 			}
-
+			Player player = getServer().getPlayer(sender.getName());
+			delHome(args[0], player);
+			save(homeDB);
+			
+		}
+		if (command.getName().toLowerCase() == get("command-homelist")) {
+			sender.sendMessage(TextFormat.AQUA + getHomeList(sender, args[0]));
 		}
 		return false;
 	}
-
+	public String getHomeList(CommandSender sender, String args) {
+		if(args == "public") {
+			for((homeDB.get in )
+		}
+		if(args == "private") {
+			
+		}
+		return null;
+	}
 	@SuppressWarnings("serial")
 	public boolean setHome(String name, final Player player, Boolean isPublic) {
 		if(homeDB.exists(name))
@@ -90,8 +105,7 @@ public class LetMeHome extends PluginBase implements Listener {
 
 	@SuppressWarnings("unchecked")
 	public boolean delHome(String name, Player player) {
-		if (((ArrayList<String>) ((LinkedHashMap<String, Object>) homeDB.get(name)).get("owner"))
-				.contains((player.getName()))) {
+		if (((LinkedHashMap<String,Object>) homeDB.get(name)).get("owner") == player.getName()) {
 			homeDB.remove(name);
 			return true;
 		}
