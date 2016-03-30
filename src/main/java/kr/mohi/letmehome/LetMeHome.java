@@ -1,6 +1,7 @@
 package kr.mohi.letmehome;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import cn.nukkit.Player;
@@ -15,7 +16,8 @@ import cn.nukkit.utils.TextFormat;
 
 public class LetMeHome extends PluginBase implements Listener {
 	private int m_version;
-	private Config messages, config, homeDB;
+	private Config config, messages;
+	private LinkedHashMap<String, Object> homeDB;
 
 	@Override
 	public void onEnable() {
@@ -38,21 +40,11 @@ public class LetMeHome extends PluginBase implements Listener {
 				return true;
 			}
 			Player player = getServer().getPlayer(sender.getName());
-			switch (args[1].toLowerCase()) {
-			case "public":
-				try {
-					setHome(args[0], player, true);
-				} catch (Exception e) {
-					getLogger().alert(e.getMessage());
-				}
-				break;
-			case "private":
-				try {
-					setHome(args[0], player, false);
-				} catch (Exception e) {
-					getLogger().alert(e.getMessage());
-				}
-				break;
+			if(args[1].toLowerCase() == "public") {
+			
+			}
+			if(args[2].toLowerCase() == "private") {
+				
 			}
 		}
 		if (command.getName().toLowerCase() == get("command-delhome")) {
@@ -66,7 +58,7 @@ public class LetMeHome extends PluginBase implements Listener {
 			}
 			Player player = getServer().getPlayer(sender.getName());
 			delHome(args[0], player);
-			save(homeDB);
+			this.save(this.homeDB, "homeDB.json");
 			
 		}
 		if (command.getName().toLowerCase() == get("command-homelist")) {
@@ -74,32 +66,33 @@ public class LetMeHome extends PluginBase implements Listener {
 		}
 		return false;
 	}
-	public String getHomeList(CommandSender sender, String args) {
-		if(args == "public") {
-			for((homeDB.get in )
+	public String getHomeList(CommandSender sender, String command) {
+		if(command == "public") {
+			
 		}
-		if(args == "private") {
+		if(command == "private") {
 			
 		}
 		return null;
 	}
 	@SuppressWarnings("serial")
-	public boolean setHome(String name, final Player player, Boolean isPublic) {
-		if(homeDB.exists(name))
-			return false;
-		homeDB.set(name, new LinkedHashMap<String, Object>() {
+	public boolean setHome(final String name, final Player player, Boolean isPublic) {
+		if(((LinkedHashMap<String, Object>) homeDB.get(player.getName())).containsKey(name)) {
+			this.message(player, this.get("message-sethome-failed-reason-overlapping"));
+		}
+		homeDB.put(name, new LinkedHashMap<String, Object>() {
 			{
 				{
-					put("owner", new ArrayList<String>().add(player.getName()));
+					put("name", name);
 					put("level", player.getLevel().toString());
 					put("x", (int) player.getX());
 					put("y", (int) player.getY());
 					put("z", (int) player.getZ());
-					put("isPublic", isPublic);
 				}
 			}
 		});
-		save(homeDB);
+		homeDB.put(player.getName(), );
+		this.save(this.homeDB, "homeDB.json");
 		return true;
 	}
 
@@ -115,7 +108,7 @@ public class LetMeHome extends PluginBase implements Listener {
 	/* ---------------------------BasicMethods--------------------------- */
 	public void initMessage() {
 		saveResource("messages.yml");
-		messages = new Config(getDataFolder() + "/messages.yml", Config.YAML);
+		this.messages = new Config(getDataFolder() + "/messages.yml", Config.YAML);
 	}
 
 	public void updateMessage() {
@@ -126,8 +119,8 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	public void initDB() {
-		homeDB = new Config(getDataFolder() + "/homeDB.json", Config.JSON);
-		config = new Config(getDataFolder() + "/config.yml", Config.YAML);
+		this.homeDB = (LinkedHashMap<String, Object>) (new Config(getDataFolder() + "/homeDB.json", Config.JSON)).getAll();
+		this.config = new Config(getDataFolder() + "/config.yml", Config.YAML);
 	}
 
 	public void registerCommands() {
@@ -144,12 +137,13 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	public void save() {
-		save(homeDB);
-		save(config);
+		Config home = new Config(getDataFolder() + "/homeDB.json", Config.JSON);
+		home.setAll(this.homeDB);
 	}
 
-	public void save(Config config) {
-		config.save();
+	public void save(LinkedHashMap<String, Object> config, String fileName) {
+		Config save = new Config(getDataFolder() + "/" + fileName, Config.JSON);
+		save.setAll(config);
 	}
 
 	public String get(String key) {
