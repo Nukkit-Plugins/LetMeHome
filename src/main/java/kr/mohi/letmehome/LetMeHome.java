@@ -1,7 +1,6 @@
 package kr.mohi.letmehome;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import cn.nukkit.Player;
@@ -30,24 +29,19 @@ public class LetMeHome extends PluginBase implements Listener {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (command.getName().toLowerCase() == get("command-sethome")) {
+		if (command.getName().toLowerCase().equals(get("command-sethome"))) {
 			if (!(sender instanceof Player)) {
 				this.getLogger().info("Do not use this command on console");
 				return true;
 			}
-			if (args.length == 0 || args.length == 1) {
+			if (args.length == 0) {
 				alert(sender, get("command.sethome.usage"));
 				return true;
 			}
 			Player player = getServer().getPlayer(sender.getName());
-			if(args[1].toLowerCase() == "public") {
-			
-			}
-			if(args[2].toLowerCase() == "private") {
-				
-			}
+			this.setHome(args[0], player);
 		}
-		if (command.getName().toLowerCase() == get("command-delhome")) {
+		if (command.getName().toLowerCase().equals(get("command-delhome"))) {
 			if (!(sender instanceof Player)) {
 				getLogger().info("Do not use this command on console");
 				return true;
@@ -59,50 +53,55 @@ public class LetMeHome extends PluginBase implements Listener {
 			Player player = getServer().getPlayer(sender.getName());
 			delHome(args[0], player);
 			this.save(this.homeDB, "homeDB.json");
-			
+
 		}
-		if (command.getName().toLowerCase() == get("command-homelist")) {
+		if (command.getName().toLowerCase().equals(get("command-homelist"))) {
 			sender.sendMessage(TextFormat.AQUA + getHomeList(sender, args[0]));
 		}
 		return false;
 	}
+
 	public String getHomeList(CommandSender sender, String command) {
-		if(command == "public") {
-			
+		if (command == "public") {
+
 		}
-		if(command == "private") {
-			
+		if (command == "private") {
+
 		}
 		return null;
 	}
-	@SuppressWarnings("serial")
-	public boolean setHome(final String name, final Player player, Boolean isPublic) {
-		if(((LinkedHashMap<String, Object>) homeDB.get(player.getName())).containsKey(name)) {
-			this.message(player, this.get("message-sethome-failed-reason-overlapping"));
+
+	@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+	public boolean setHome(final String name, final Player player) {
+		for (LinkedHashMap<String, Object> l : (ArrayList<LinkedHashMap>) homeDB.get(player.getName().toLowerCase())) {
+			if (l.get("name").equals(name)) {
+				this.message(player, this.get("message-sethome-failed-reason-overlapping"));
+				return false;
+			}
 		}
-		homeDB.put(name, new LinkedHashMap<String, Object>() {
+		homeDB.put(player.getName().toLowerCase(), new ArrayList<LinkedHashMap>() {
 			{
-				{
-					put("name", name);
-					put("level", player.getLevel().toString());
-					put("x", (int) player.getX());
-					put("y", (int) player.getY());
-					put("z", (int) player.getZ());
-				}
+				add(new LinkedHashMap<String, Object>() {
+					{
+						put("name", name);
+						put("x", player.getX());
+						put("y", player.getY());
+						put("z", player.getZ());
+					}
+				});
 			}
 		});
-		homeDB.put(player.getName(), );
 		this.save(this.homeDB, "homeDB.json");
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean delHome(String name, Player player) {
-		if (((LinkedHashMap<String,Object>) homeDB.get(name)).get("owner") == player.getName()) {
+		if (((LinkedHashMap<String, Object>) homeDB.get(name)).get("owner") == player.getName()) {
 			homeDB.remove(name);
 			return true;
-		}
-		else return false;
+		} else
+			return false;
 	}
 
 	/* ---------------------------BasicMethods--------------------------- */
@@ -119,7 +118,8 @@ public class LetMeHome extends PluginBase implements Listener {
 	}
 
 	public void initDB() {
-		this.homeDB = (LinkedHashMap<String, Object>) (new Config(getDataFolder() + "/homeDB.json", Config.JSON)).getAll();
+		this.homeDB = (LinkedHashMap<String, Object>) (new Config(getDataFolder() + "/homeDB.json", Config.JSON))
+				.getAll();
 		this.config = new Config(getDataFolder() + "/config.yml", Config.YAML);
 	}
 
