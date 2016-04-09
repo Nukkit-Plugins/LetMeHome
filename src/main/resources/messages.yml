@@ -2,7 +2,7 @@ m_version: 1
 
 default-language: "eng"
 
-eng-default-prefix: "[Home]"
+eng-default-prefix: "[SimpleHome]"
 eng-command-sethome: "sethome"
 eng-command-delhome: "delhome"
 eng-command-home: "home"
@@ -10,7 +10,7 @@ eng-command-homelist: "homelist"
 eng-command-stophome: "stophome"
 
 eng-command-sethome-usage: "/sethome < name >"
-eng-command-delhome-usage: "/delhome < id >"
+eng-command-delhome-usage: "/delhome < name >"
 eng-comand-homelist-usage: "/homelist"
 eng-command-home-usage: "/home <name>"
 
@@ -21,9 +21,12 @@ eng-command-home-descript: "Teleport your home"
 
 eng-message-delhome-success: "Home was removed successful"
 eng-message-delhome-failed: "Failed to remove it"
-eng-message-delhome-failed-reason-not-found: "Home is not existing"
+eng-message-delhome-failed-not-found: "Home is not existing"
 eng-message-sethome-success: "Home was saved successful"
 eng-message-sethome-failed: "Failed to save the home"
 eng-message-sethome-failed-reason-overlapping: "That name is already existing"
+eng-message-home-success: "It's your home!"
+eng-message-home-failed: "Failed to go home"
+eng-message-home-failed-not-found: "There is no home using that name"
 
 eng-message-homelist-first: "Your Home List : "
