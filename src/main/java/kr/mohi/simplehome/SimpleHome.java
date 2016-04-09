@@ -9,6 +9,8 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.SimpleCommandMap;
 import cn.nukkit.event.Listener;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
@@ -28,6 +30,7 @@ public class SimpleHome extends PluginBase implements Listener {
 		this.getLogger().info("SimpleHome is enabled");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (command.getName().toLowerCase().equals(get("command-sethome"))) {
@@ -40,6 +43,7 @@ public class SimpleHome extends PluginBase implements Listener {
 				return true;
 			}
 			this.setHome(args[0], getServer().getPlayer(sender.getName()));
+			return true;
 		}
 		if (command.getName().toLowerCase().equals(get("command-delhome"))) {
 			if (!(sender instanceof Player)) {
@@ -52,13 +56,38 @@ public class SimpleHome extends PluginBase implements Listener {
 			}
 			this.delHome(args[0], sender);
 			this.save();
+			return true;
 		}
 		if (command.getName().toLowerCase().equals(get("command-homelist"))) {
 			sender.sendMessage(TextFormat.AQUA + "[Home]" + this.get("message-homelist-first"));
-			for (LinkedHashMap<String, Object> l : this.getHomeList(sender)) {
-				sender.sendMessage("#" + this.getHomeList(sender).indexOf(l) + " " + l.get("name"));
+			for (String s : this.getHomeList(sender).keySet()) {
+				int x = Math.round((Float) ((LinkedHashMap<String, Object>) getHomeList(sender).get(s)).get("x"));
+				int y = Math.round((Float) ((LinkedHashMap<String, Object>) getHomeList(sender).get(s)).get("y"));
+				int z = Math.round((Float) ((LinkedHashMap<String, Object>) getHomeList(sender).get(s)).get("z"));
+				String level = (String) ((LinkedHashMap<String, Object>) getHomeList(sender).get(s)).get("level");
+				sender.sendMessage(s + " - " + "X: " + x + ", Y: " + y + ", Z: " + z + ", World : " + level);
 			}
 			return true;
+		}
+		if (command.getName().toLowerCase().equals(get("command-home"))) {
+			if (!(sender instanceof Player)) {
+				this.getLogger().info("Do not use this command on console");
+				return true;
+			}
+				if (args.length == 0) {
+					this.alert(sender, this.get("command-home-usage"));
+					return true;
+				}
+			if (this.getHomeList(sender).containsKey(args[0])) {
+				Player player = this.getServer().getPlayer(sender.getName());
+				int x = Math.round((Float) ((LinkedHashMap<String, Object>) getHomeList(sender).get(args[0])).get("x"));
+				int y = Math.round((Float) ((LinkedHashMap<String, Object>) getHomeList(sender).get(args[0])).get("y"));
+				int z = Math.round((Float) ((LinkedHashMap<String, Object>) getHomeList(sender).get(args[0])).get("z"));
+				Level level = this.getServer().getLevelByName(
+						(String) ((LinkedHashMap<String, Object>) getHomeList(sender).get(args[0])).get("level"));
+				player.teleport(new Position(x, y, z, level));
+				return true;
+			}
 		}
 		return false;
 	}
@@ -70,8 +99,8 @@ public class SimpleHome extends PluginBase implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public ArrayList<LinkedHashMap<String, Object>> getHomeList(CommandSender sender) {
-		return (ArrayList<LinkedHashMap<String, Object>>) homeDB.get(sender.getName().toLowerCase());
+	public LinkedHashMap<String, Object> getHomeList(CommandSender sender) {
+		return (LinkedHashMap<String, Object>) homeDB.get(sender.getName().toLowerCase());
 	}
 
 	@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
@@ -82,14 +111,14 @@ public class SimpleHome extends PluginBase implements Listener {
 				return false;
 			}
 		}
-		homeDB.put(player.getName().toLowerCase(), new ArrayList<LinkedHashMap>() {
+		homeDB.put(player.getName().toLowerCase(), new LinkedHashMap<String, Object>() {
 			{
-				add(new LinkedHashMap<String, Object>() {
+				put(name, new LinkedHashMap<String, Object>() {
 					{
-						put("name", name);
 						put("x", player.getX());
 						put("y", player.getY());
 						put("z", player.getZ());
+						put("level", player.getLevel());
 					}
 				});
 			}
