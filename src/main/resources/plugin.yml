@@ -1,5 +1,20 @@
 name: LetMeHome
-main: kr.mohi.letmehome.LetMeHome
+main: kr.mohi.simplehome.SimpleHome
 author: MohiPE
 version: "1.0.0"
 api: ["1.0.0"]
+permissions:
+ simplehome.*:
+  default: true
+  children:
+   simplehome.commands.*:
+    default: true
+    children:
+     simplehome.command.sethome:
+      default: true
+     simplehome.command.delhome:
+      default: true
+     simplehome.command.home:
+      default: true
+     simplehome.command.homelist:
+      default: true
