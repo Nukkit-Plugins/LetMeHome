@@ -56,7 +56,7 @@ public class SimpleHome extends PluginBase implements Listener {
 				alert(sender, get("command-sethome-usage"));
 				return true;
 			}
-			this.setHome(new HomePosition(player.getX(), player.getY(), player.getZ(), player. getY(), player. getLevel()), player);
+			this.setHome(new HomePosition(player.getX(), player.getY(), player.getZ(), player. getY(), player. getLevel()), args[0] player);
 			this.save();
 			this.message(sender, this.get("message-sethome-success"));
 			return true;
