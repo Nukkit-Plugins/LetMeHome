@@ -1,14 +1,10 @@
 package kr.mohi.simplehome;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
@@ -16,10 +12,6 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.SimpleCommandMap;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.TextContainer;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.level.Position;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
@@ -28,9 +20,6 @@ public class SimpleHome extends PluginBase implements Listener {
 	private int m_version;
 	private Config messages;
 	private LinkedHashMap<String, Object> homeDB;
-	private Gson gson;
-
-	private Map<String, HomePosition> homePositions;
 
 	@Override
 	public void onEnable() {
@@ -39,7 +28,6 @@ public class SimpleHome extends PluginBase implements Listener {
 		this.initMessage();
 		this.updateMessage();
 		this.registerCommands();
-		this.gson = new GsonBuilder().setPrettyPrinting().create();
 		this.getServer().getPluginManager().registerEvents(this, this);
 		this.getLogger().info("SimpleHome is enabled");
 	}
