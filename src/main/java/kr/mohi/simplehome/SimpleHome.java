@@ -52,11 +52,17 @@ public class SimpleHome extends PluginBase implements Listener {
 				this.getLogger().info("Do not use this command on console");
 				return true;
 			}
-			if (args.length == 0) {
+			if (args.length == 0 && args[0] == "") {
 				alert(sender, get("command-sethome-usage"));
 				return true;
 			}
-			this.setHome(new HomePosition(player.getX(), player.getY(), player.getZ(), player. getY(), player. getLevel()), args[0] player);
+			if(this.getHomePositionByName(player, args[0]) != null) {
+				this.alert(sender, this.get("command-sethome-failed"));
+				this.alert(sender, this.get("command-sethome-failed-overlapping"));
+				return true;
+			}
+			HomePosition home = new HomePosition(player.getX(), player.getY(), player.getZ(), player.getLevel(), args[0], player.getName().toLowerCase());
+			this.setHome(home, sender);
 			this.save();
 			this.message(sender, this.get("message-sethome-success"));
 			return true;
