@@ -5,7 +5,7 @@ import java.io.Serializable;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
-public class HomePosition implements Seriazable{
+public class HomePosition implements Serializable{
 	private double x, y, z;
 	private String name, owner;
 	private Level level;
