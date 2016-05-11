@@ -1,9 +1,11 @@
-package kr.mohi.simplehome;
+package kr.mohi.simplehome
+
+import java.io.Serializable;
 
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
-public class HomePosition {
+public class HomePosition implements Seriazable{
 	private double x, y, z;
 	private String name, owner;
 	private Level level;
