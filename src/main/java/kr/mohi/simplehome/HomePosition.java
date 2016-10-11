@@ -1,4 +1,4 @@
-package kr.mohi.simplehome
+package kr.mohi.simplehome;
 
 import java.io.Serializable;
 
